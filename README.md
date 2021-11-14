@@ -1,5 +1,5 @@
 # organizador
-###Organiza archivos en carpetas teniendo como referencia las similitudes en sus nombres.
+#### Organiza archivos en carpetas teniendo como referencia las similitudes en sus nombres.
 
 -Ejecute main.py en el directorio donde se desee organizar los archivos.
 
