@@ -45,7 +45,7 @@ def comparar(nombre='',nombre2=''):
 
     similar = (0,'')
     len_nombre=len(nombre)
-    #len_nombre2=len(nombre2)
+    len_nombre2=len(nombre2)
 
     for cant_caract in range(caract_selec_min, len_nombre + 1):
 
@@ -56,8 +56,8 @@ def comparar(nombre='',nombre2=''):
                 if cant_caract>similar[0]:
                     similar=(cant_caract,seleccion)
 
-    #total= len_nombre if len_nombre>len_nombre2 else len_nombre2
-    return (similar[0]*100)/len_nombre,similar[1]
+    total= len_nombre if len_nombre>len_nombre2 else len_nombre2
+    return (similar[0]*100)/total,similar[1]
 
 def inicio():
 
