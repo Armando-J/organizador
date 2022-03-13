@@ -1,7 +1,6 @@
 from os import listdir,system
 from time import time
 from aj_progressB import Bar
-#import re
 
 class Procesar_Similares():
 
@@ -65,6 +64,12 @@ def inicio():
     print('\nOrganizando archivos:\n')
     archivos = listdir()
     archivos1 = []
+    arch_v=[]
+    if 'Organizados' in archivos:
+        #Ya hay archivos similares de búsquedas pasadas
+        arch_v=listdir('Organizados')
+        archivos1.extend(map(lambda x:[x,True],arch_v))
+
 
     for arch in archivos:
         # quitar extension y carpetas
@@ -141,14 +146,17 @@ def inicio():
         print('Reprocesando resultados: {0}'.format(len(proc.similares_proc)))
 
         #moviendo archivos
-        system('mkdir Organizados')
+        if not 'Organizados' in archivos:
+            system('mkdir Organizados')
+
         for similar in proc.similares_proc:
 
             while similar[-1]==' ' or similar[-1]=='.':
                 #quitar el espacio y el punto despues de la palabra
                 similar=similar[:-1]
 
-            system('mkdir Organizados/"{0}"'.format(similar))
+            if not similar in arch_v:
+                system('mkdir Organizados/"{0}"'.format(similar))
             system('mv *"{0}"* Organizados/"{0}"'.format(similar))
 
 
