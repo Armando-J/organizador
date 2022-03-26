@@ -4,59 +4,84 @@ from aj_progressB import Bar
 
 class Procesar_Similares():
 
-    def __init__(self):
-        self.similares=[]
+    def __init__(self,files):
+        self.files=files
         self.similares_proc=[]
 
+    def buscar(self,percent_match,reprocesar=False):
+        cont = 0
+        files=list(map(lambda x:[x,True],self.files))
 
-    def add_similar(self,texto):
+        if not reprocesar:
+            self.files=[]
 
-        if texto not in self.similares:
-            self.similares.append(texto)
+        bar = Bar('\nBuscando al {0}%: '.format(percent_match), max_val1=len(files))
 
-    def reprocesar(self):
-        self.similares_proc=self.similares[:]
-        if self.similares:
-            bar1=Bar('\nReprocesando: ',max_val1=len(self.similares_proc))
+        while cont < len(files):
 
-            for cont in range(len(self.similares)):
+            if files[cont][1]:  # si el archivo seleccionado no ha dado similar .
 
-                similar=self.similares[cont]
-                bar1.set_max_val( len(self.similares[cont + 1:]))
+                archivo = files[cont][0]
 
-                for similar1 in self.similares[cont+1:]:
+                l_archivos_comp = files[cont + 1:]  # lista de archivos a comparar con el archivo seleccionado
 
-                    match = comparar(similar,similar1)
-                    if match[0]>80:
-                        if similar in self.similares_proc:
-                            self.similares_proc.remove(similar)
-                        if similar1 in self.similares_proc:
-                            self.similares_proc.remove(similar1)
-                        self.similares_proc.append(match[1])
-                    bar1.update()
+                if l_archivos_comp:  # si existen archivos para comparar con el archivo seleccionado
+
+                    bar.set_max_val(len(l_archivos_comp))
+
+                    similar_general = (101, '')
+
+                    for archivo_comp in l_archivos_comp:
+
+                        if archivo_comp[1]:  # si el archivo a comparar seleccionado no a dado similar
+
+                            match = self._comparar(archivo, archivo_comp[0])
+                            #print('{2}{3} {0} == {1}'.format(archivo,archivo_comp[0],reprocesar,match[0]))
+                            if match[0] > percent_match:
+                                # print(match)
+                                archivo_comp[1] = False
+                                if similar_general[0] > match[0]:
+                                    similar_general = match
+
+                                if reprocesar:self.files.remove(archivo_comp[0])
 
 
-                bar1.update1()
 
-def comparar(nombre='',nombre2=''):
-    'Compara dos textos y devuelve el porciento de similitud y el fragmento comun'
-    caract_selec_min = 2
+                        bar.update()
 
-    similar = (0,'')
-    len_nombre=len(nombre)
-    len_nombre2=len(nombre2)
+                    if similar_general[0] != 101:
+                        self.files.append(similar_general[1])
+                        if reprocesar:self.files.remove(archivo)
 
-    for cant_caract in range(caract_selec_min, len_nombre + 1):
 
-        for cont_ini in range(len_nombre-cant_caract+1):
 
-            seleccion=nombre[cont_ini:cant_caract+cont_ini]
-            if  seleccion in nombre2:
-                if cant_caract>similar[0]:
-                    similar=(cant_caract,seleccion)
 
-    total= len_nombre if len_nombre>len_nombre2 else len_nombre2
-    return (similar[0]*100)/total,similar[1]
+
+            cont += 1
+            bar.update1()
+        #print('\n\n[{0}]\n\n'.format(','.join(self.files)))
+        print('\nSimilares: {0}'.format(len(self.files)))
+
+    def _comparar(self,nombre='', nombre2=''):
+        'Compara dos textos y devuelve el porciento de similitud y el fragmento comun'
+        caract_selec_min = 2
+
+        similar = (0, '')
+        len_nombre = len(nombre)
+        len_nombre2 = len(nombre2)
+
+        for cant_caract in range(caract_selec_min, len_nombre + 1):
+
+            for cont_ini in range(len_nombre - cant_caract + 1):
+
+                seleccion = nombre[cont_ini:cant_caract + cont_ini]
+                if seleccion in nombre2:
+                    if cant_caract > similar[0]:
+                        similar = (cant_caract, seleccion)
+
+        total = len_nombre if len_nombre > len_nombre2 else len_nombre2
+        return (similar[0] * 100) / total, similar[1]
+
 
 def inicio():
 
@@ -65,10 +90,10 @@ def inicio():
     archivos = listdir()
     archivos1 = []
     arch_v=[]
-    if 'Organizados' in archivos:
+    '''if 'Organizados' in archivos:
         #Ya hay archivos similares de búsquedas pasadas
         arch_v=listdir('Organizados')
-        archivos1.extend(map(lambda x:[x,True],arch_v))
+        archivos1.extend(arch_v)'''
 
 
     for arch in archivos:
@@ -80,76 +105,23 @@ def inicio():
         '''for pal in lista_negra:
             arch_mod=arch_mod.replace(pal,lista_negra[pal])'''
 
-        if arch_mod: archivos1.append([arch_mod, True])
+        if arch_mod: archivos1.append(arch_mod)
 
-    proc=Procesar_Similares()
+    proc=Procesar_Similares(archivos1)
 
-    cont=0
-    bar=Bar('Buscando: ',max_val1=len(archivos1))
+    proc.buscar(85)
+    proc.buscar(90,True)
 
-    while cont<len(archivos1):
+    if proc.files:
 
-        if archivos1[cont][1]:#si el archivo seleccionado no ha dado similar .
-
-            archivo = archivos1[cont][0]
-
-            l_archivos_comp=archivos1[cont+1:] #lista de archivos a comparar con el archivo seleccionado
-
-            if l_archivos_comp:#si existen archivos para comparar con el archivo seleccionado
-
-                bar.set_max_val(len(l_archivos_comp))
-
-                similar_general=(101,'')
-
-                for archivo_comp in l_archivos_comp:
-
-                    if archivo_comp[1] :#si el archivo a comparar seleccionado no a dado similar
-
-                        match=comparar(archivo,archivo_comp[0])
-
-                        if match[0]>85:
-                            #print(match)
-                            archivo_comp[1]=False
-                            if similar_general[0]>match[0]:
-                                similar_general=match
-
-                    bar.update()
-
-                if similar_general[0]!=101 :proc.add_similar(similar_general[1])
-        cont+=1
-        bar.update1()
-
-
-
-    proc.reprocesar()
-
-
-    #for x in proc.similares:print(x)
-    #print('*****************************************')
-    #for x in proc.similares_proc:print(x)
-
-
-
-    '''def get_Mm(text=''):
-        l_t=[]
-        for c in text:
-            if re.match('[A-Za-z]',c):
-                l_t.append('[{0} {1}]'.format(c.lower(),c.upper()))
-            else:
-                l_t.append(c)
-    
-        return ''.join(l_t)'''
-
-    if proc.similares_proc:
-
-        print('\n\nCaracteres similares: {0}'.format(len(proc.similares)))
-        print('Reprocesando resultados: {0}'.format(len(proc.similares_proc)))
+        #print('\n\nCaracteres similares: {0}'.format(len(proc.files)))
+        #print('Reprocesando resultados: {0}'.format(len(proc.similares_proc)))
 
         #moviendo archivos
         if not 'Organizados' in archivos:
             system('mkdir Organizados')
 
-        for similar in proc.similares_proc:
+        for similar in proc.files:
 
             while similar[-1]==' ' or similar[-1]=='.':
                 #quitar el espacio y el punto despues de la palabra
