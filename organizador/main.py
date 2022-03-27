@@ -54,10 +54,6 @@ class Procesar_Similares():
                             self.files.append(similar_general[1])
                             if reprocesar:self.files.remove(archivo)
 
-
-
-
-
                 cont += 1
                 bar.update1()
             #print('\n\n[{0}]\n\n'.format(','.join(self.files)))
@@ -82,7 +78,6 @@ class Procesar_Similares():
 
         total = len_nombre if len_nombre > len_nombre2 else len_nombre2
         return (similar[0] * 100) / total, similar[1]
-
 
 def inicio():
 
