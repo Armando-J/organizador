@@ -5,7 +5,7 @@ with open ( "README.md" , "r" ) as fh :
 
 setup(
     name="organizador",
-    version="0.1",
+    version="0.1.1",
     description="Organiza archivos en carpetas teniendo como referencia las similitudes en sus nombres.",
     long_description = long_description ,
     long_description_content_type = "text/markdown" ,

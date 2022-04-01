@@ -1,11 +1,11 @@
 # organizador
 #### Organiza archivos en carpetas teniendo como referencia las similitudes en sus nombres.
 
-###Instalación:
+### Instalación:
 
 ```pip install organizador```
 
-###Ejemplo:
+### Ejemplo:
 
 - Ejecuta `python3 organizador/main.py` dentro del directorio a ordenar.
 ```
