@@ -1,8 +1,13 @@
 # organizador
 #### Organiza archivos en carpetas teniendo como referencia las similitudes en sus nombres.
 
--Ejecute main.py en el directorio donde se desee organizar los archivos.
+###Instalación:
 
+```pip install organizador```
+
+###Ejemplo:
+
+- Ejecuta `python3 organizador/main.py` dentro del directorio a ordenar.
 ```
 aj@Armando:~/Nueva carpeta$ ls
 
@@ -26,7 +31,7 @@ aj@Armando:~/Nueva carpeta$ ls
 'Bungou Stray Dogs Wan! Episodio 1.mp4'                       'Spirit Sword Sovereign 4 Episodio 43 Sub Español.mp4'
 'Bungou Stray Dogs Wan! Episodio 2.mp4'
 
-aj@Armando:~/Nueva carpeta$ aj-org 
+aj@Armando:~/Nueva carpeta$ python3 organizador/main.py 
 
 Organizando archivos:
 
