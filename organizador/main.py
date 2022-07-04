@@ -86,19 +86,28 @@ def inicio():
     archivos = listdir()
     archivos1 = []
     arch_v=[]
-    if 'Organizados' in archivos:
-        #Ya hay archivos similares de búsquedas pasadas
-        arch_v=listdir('Organizados')
 
-        if not 'Errores' in archivos:
-            system('mkdir Errores')
+    def mover_existentes(nombre,archivos):
+        if nombre in archivos:
+            #Ya hay archivos similares de búsquedas pasadas
+            arch_v=listdir(nombre)
 
-        for arch_o in arch_v:
+            if not 'Errores' in archivos:
+                system('mkdir Errores')
 
-            system('mv *"{0}"* Organizados/"{0}" 2>>Errores/errores1.txt'.format(arch_o))
-        sleep(3)
-        archivos = listdir()
+            for arch_o in arch_v:
 
+                system(f'mv *"{arch_o}"* {nombre}/"{arch_o}" 2>>Errores/errores_{nombre}.txt')
+                sleep(0.1)
+            sleep(3)
+            #archivos = listdir()
+            return arch_v,listdir()
+        return [],archivos
+    #'Organizados'
+
+    arch_v,archivos=mover_existentes('Organizados',archivos)
+
+    archivos = mover_existentes('Borrar', archivos)[1]
 
 
 
@@ -128,6 +137,9 @@ def inicio():
             system('mkdir Organizados')
         if not 'Errores' in archivos:
             system('mkdir Errores')
+        if not 'Borrar' in archivos:
+            system('mkdir Borrar')
+
         for similar in proc.files:
 
             while similar[-1]==' ' or similar[-1]=='.':
@@ -139,7 +151,7 @@ def inicio():
 
 
 
-            system('mv *"{0}"* Organizados/"{0}" 2>Errores/errores2.txt'.format(similar))
+            system('mv *"{0}"* Organizados/"{0}" 2>Errores/errores_similares.txt'.format(similar))
 
 
     print('\nTerminado en {0} segundos.'.format(round((time()-ini),2)))
