@@ -79,35 +79,72 @@ class Procesar_Similares():
         total = len_nombre if len_nombre > len_nombre2 else len_nombre2
         return (similar[0] * 100) / total, similar[1]
 
+def get_nombre_arch(archivos):
+    def get_name(texto):
+        a=texto.split('.')
+
+        if len(a)==2:result=a[0]
+        elif len(a)>2:result='.'.join(a[:-1])
+        else:result=None
+
+        return result
+
+    if type(archivos) == str:
+        return get_name(archivos)
+
+    else:
+        cont=0
+        for arch in archivos:
+            if get_name(arch):cont+=1
+
+        return cont
+
 def inicio():
 
     ini = time()
     print('\nOrganizando archivos:\n')
     archivos = listdir()
     archivos1 = []
-    arch_v=[]
+    #arch_v=[]
+    cant_arch_ini=get_nombre_arch(archivos)
+
+    NUEVOS='Nuevos'
+    ORGANIZADOS='Organizados'
+    BORRAR='Borrar'
+    ERRORES='Errores'
 
     def mover_existentes(nombre,archivos):
         if nombre in archivos:
-            #Ya hay archivos similares de búsquedas pasadas
-            arch_v=listdir(nombre)
+            arch_v = listdir(nombre)
 
-            if not 'Errores' in archivos:
-                system('mkdir Errores')
+            if arch_v:
+                #Ya hay archivos similares de búsquedas pasadas
+                arch_v=listdir(nombre)
 
-            for arch_o in arch_v:
+                if not ERRORES in archivos:
+                    system(f'mkdir {ERRORES}')
 
-                system(f'mv *"{arch_o}"* {nombre}/"{arch_o}" 2>>Errores/errores_{nombre}.txt')
-                sleep(0.1)
-            sleep(3)
-            #archivos = listdir()
-            return arch_v,listdir()
-        return [],archivos
+                for arch_o in arch_v:
+
+                    system(f'mv *"{arch_o}"* {nombre}/"{arch_o}" 2>>{ERRORES}/errores_{nombre}.txt')
+                    #sleep(0.1)
+                sleep(3)
+                #archivos = listdir()
+                #return arch_v,listdir()
+                return listdir()
+
+            else: return archivos
+        #return [],archivos
+        return archivos
     #'Organizados'
 
-    arch_v,archivos=mover_existentes('Organizados',archivos)
+    #arch_v,archivos=mover_existentes(ORGANIZADOS,archivos)
+    archivos = mover_existentes(ORGANIZADOS, archivos)
+    cant_arch_org=get_nombre_arch(listdir())
 
-    archivos = mover_existentes('Borrar', archivos)[1]
+    #archivos = mover_existentes(BORRAR, archivos)[1]
+    archivos = mover_existentes(BORRAR, archivos)
+    cant_arch_borrar=get_nombre_arch(listdir())
 
 
 
@@ -115,7 +152,8 @@ def inicio():
         # quitar extension y carpetas
         # lista_negra={'Episodio':'','[1080p]':''}
 
-        arch_mod = '.'.join(arch.split('.')[:-1])
+        #arch_mod = '.'.join(arch.split('.')[:-1])
+        arch_mod= get_nombre_arch(arch)
 
         '''for pal in lista_negra:
             arch_mod=arch_mod.replace(pal,lista_negra[pal])'''
@@ -133,12 +171,14 @@ def inicio():
         #print('Reprocesando resultados: {0}'.format(len(proc.similares_proc)))
 
         #moviendo archivos
-        if not 'Organizados' in archivos:
-            system('mkdir Organizados')
-        if not 'Errores' in archivos:
-            system('mkdir Errores')
-        if not 'Borrar' in archivos:
-            system('mkdir Borrar')
+        if not ORGANIZADOS in archivos:
+            system(f'mkdir {ORGANIZADOS}')
+        if not ERRORES in archivos:
+            system(f'mkdir {ERRORES}')
+        if not BORRAR in archivos:
+            system(f'mkdir {BORRAR}')
+        if not NUEVOS in archivos:
+            system(f'mkdir {NUEVOS}')
 
         for similar in proc.files:
 
@@ -146,14 +186,20 @@ def inicio():
                 #quitar el espacio y el punto despues de la palabra
                 similar=similar[:-1]
 
-            if not similar in arch_v:
-                system('mkdir Organizados/"{0}"'.format(similar))
+            '''if not similar in arch_v:#si no esta la carpeta creada
+                system(f'mkdir {NUEVOS}/"{similar}"')'''
 
+            system(f'mkdir {NUEVOS}/"{similar}"')
 
+            system(f'mv *"{similar}"* {NUEVOS}/"{similar}" 2>Errores/errores_similares.txt')
 
-            system('mv *"{0}"* Organizados/"{0}" 2>Errores/errores_similares.txt'.format(similar))
+    cant_arch_finales=get_nombre_arch(listdir())
 
-
+    print(f'\narch iniciales: {cant_arch_ini}\n'
+          f'arch organizados: {cant_arch_ini-cant_arch_org}\n'
+          f'arch borrar: {cant_arch_org-cant_arch_borrar}\n'
+          f'arch nuevos: {cant_arch_borrar-cant_arch_finales}\n'
+          f'arch sin procesar: {cant_arch_finales}')
     print('\nTerminado en {0} segundos.'.format(round((time()-ini),2)))
 
 if __name__ == '__main__':inicio()
