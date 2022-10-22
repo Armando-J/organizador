@@ -146,6 +146,8 @@ def inicio():
     archivos = mover_existentes(BORRAR, archivos)
     cant_arch_borrar=get_nombre_arch(listdir())
 
+    archivos = mover_existentes(NUEVOS, archivos)
+
 
 
     for arch in archivos:
